@@ -39,7 +39,7 @@ func auth(w http.ResponseWriter, req *http.Request) {
 	config := getConfig()
 	code := req.URL.Query()["code"]
 
-	// User provided access code
+	// Client provided access code
 	if len(code) != 0 {
 		// URL to POST to
 		url := "https://zoom.us/oauth/token?grant_type=authorization_code&code=" + code[0] + "&redirect_uri=" + config["RedirectURL"]
@@ -66,6 +66,9 @@ func auth(w http.ResponseWriter, req *http.Request) {
 		}
 		fmt.Printf("%s\n", body)
 
+		// Return response to client
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(body)
 	} else {
 		// No access code provided, redirect to auth
 		redirectURL := "https://zoom.us/oauth/authorize?response_type=code&client_id=" + config["ClientID"] + "&redirect_uri=" + config["RedirectURL"]
